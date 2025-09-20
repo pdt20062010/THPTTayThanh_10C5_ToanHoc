@@ -25,11 +25,16 @@
     .controls{display:flex;gap:12px;margin-top:14px}
     .small{font-size:14px;color:var(--muted)}
     .meter{display:flex;align-items:center;gap:8px;font-size:16px}
+    .container {
+  max-width: 1200px;   /* cho khung rộng tối đa */
+  margin: 0 auto;      /* căn giữa theo chiều ngang */
+  padding: 20px;
+}
     footer{margin-top:20px;text-align:center;color:var(--muted);font-size:15px}
 button, .device-btn {
   width: 100%;
   padding: 14px 16px;
-  border-radius: 10px;
+  border-radius: 15px;
   border: 2px solid var(--accent);
   background: transparent;
   color: var(--accent);
@@ -48,9 +53,34 @@ button:hover, .device-btn:hover {
     .visual{height:260px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.006));display:flex;align-items:center;justify-content:center;flex-direction:column}
     .meter-svg{width:240px;height:140px}
     .warning{color:#ffcccc;font-size:15px}
-    @media (max-width:880px){.grid{grid-template-columns:1fr;}.wrap{margin:16px}}
+   /* Desktop rộng */
+@media (min-width:1200px){
+  .wrap{max-width: 95%; padding:50px;}
+  .grid{grid-template-columns: 2fr 1fr;}
+}
+
+/* Tablet ngang hoặc vừa */
+@media (max-width:880px){
+  .grid{grid-template-columns:1fr;}
+  .wrap{margin:16px; padding:20px;}
+  .meter-svg{width:100%; height:auto;}
+}
+
+/* Điện thoại nhỏ */
+@media (max-width:600px){
+  body{font-size:16px}
+  .wrap{padding:16px}
+  h1{font-size:22px}
+  .logo{font-size:24px; width:120px; height:60px}
+  input, button{font-size:16px; padding:12px}
+  .result{font-size:20px}
+  .meter{font-size:14px}
+  .meter-svg{width:100%; max-width:300px; height:auto}
+}
+
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <header>
@@ -215,14 +245,14 @@ button:hover, .device-btn:hover {
     eyeEl.addEventListener('input', showCalc)
 
     resetBtn.addEventListener('click', ()=>{
-      distanceEl.value = 0
-      angleEl.value = 0
-      eyeEl.value = 0
-      degToRad.value = ''
-      resultEl.textContent = 'Chiều cao cây: — m'
-      calcSteps.textContent = ''
-      updateVisual(30,5,6)
-    })
+  distanceEl.value = 0
+  angleEl.value = 0
+  eyeEl.value = 0
+  resultEl.textContent = 'Chiều cao cây: — m'
+  calcSteps.textContent = ''
+  updateVisual(0,0,0)   // reset luôn phần minh họa
+})
+
 
     let sensorActive = false
     useSensorBtn.addEventListener('click', async ()=>{
