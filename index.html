@@ -14,8 +14,14 @@
     p.lead{color:var(--muted);margin:12px 0 24px;font-size:18px}
     .grid{display:grid;grid-template-columns:1fr 400px;gap:24px}
     .card{background:var(--card);padding:24px;border-radius:16px;font-size:18px}
-    label{display:block;font-size:16px;color:var(--muted);margin-bottom:8px}
-    input[type=number], input[type=text], button{width:100%;padding:14px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;font-size:18px}
+label {
+  display: block;
+  font-size: 18px;         /* to hơn một chút */
+  font-weight: 600;        /* đậm hơn */
+  color: #60a5fa;          /* màu xanh nổi bật (giống accent của bạn) */
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* tạo bóng nhẹ */
+}    input[type=number], input[type=text], button{width:100%;padding:14px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;font-size:18px}
     .row{display:flex;gap:14px}
     .row > *{flex:1}
     .result{font-size:24px;font-weight:700;color:var(--accent);margin-top:10px}
@@ -91,24 +97,27 @@ button:hover, .device-btn:hover {
 
     <div class="grid">
       <section class="card">
+          <button id="toggleBtn" class="btn-toggle">Không có thước đo</button>
+
         <h2>Các tham số đo</h2>
         <div style="margin-top:14px">
           <label>Khoảng cách từ chân bạn đến gốc cây (m)</label>
-          <input id="distance" type="number" min="0" step="0.01" value="5">
+          <input id="distance" type="number" min="0" step="0.01" value="0">
           <div class="hint">Ví dụ: đứng cách gốc cây 5 mét.</div>
         </div>
 
+        
         <div style="margin-top:14px">
           <label>Góc nhìn (độ)</label>
           <div class="row">
-            <input id="angle" type="number" min="0" max="89.9" step="0.1" value="30">
+            <input id="angle" type="number" min="0" max="89.9" step="0.1" value="0">
           </div>
           <div class="hint">Góc là góc nhìn từ mắt bạn tới đỉnh cây phía trên (độ). Có thể nhập thủ công. </div>
         </div>
 
         <div style="margin-top:14px">
           <label>Chiều cao mắt bạn so với mặt đất (m)</label>
-          <input id="eyeHeight" type="number" min="0" step="0.01" value="1.6">
+          <input id="eyeHeight" type="number" min="0" step="0.01" value="0">
           <div class="hint">Ví dụ trung bình khoảng 1.5–1.7 m. Nếu bạn đo từ cao thấp khác, chỉnh cho đúng.</div>
         </div>
 
@@ -147,9 +156,9 @@ button:hover, .device-btn:hover {
           </svg>
 
           <div class="meter" style="margin-top:10px">
-            <div>Góc: <span id="angleShow">30°</span></div>
+            <div>Góc: <span id="angleShow">0°</span></div>
             <div style="width:8px"></div>
-            <div>Khoảng cách: <span id="distShow">5 m</span></div>
+            <div>Khoảng cách: <span id="distShow">0 m</span></div>
           </div>
 
           <div class="hint" style="margin-top:10px"></div>
@@ -172,6 +181,11 @@ button:hover, .device-btn:hover {
   </div>
 
   <script>
+    const btn = document.getElementById("toggleBtn");
+    btn.addEventListener("click", ()=>{
+      // khi ấn nút thì chuyển sang trang no-ruler.html
+      window.location.href = "no-ruler.html";
+    });
     function deg2rad(d){return d * Math.PI / 180}
     const distanceEl = document.getElementById('distance')
     const angleEl = document.getElementById('angle')
@@ -252,34 +266,7 @@ button:hover, .device-btn:hover {
 })
 
 
-    let sensorActive = false
-    useSensorBtn.addEventListener('click', async ()=>{
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
-        try{
-          const perm = await DeviceOrientationEvent.requestPermission()
-          if (perm !== 'granted'){
-            alert('Bạn cần cho phép cảm biến để dùng tính năng này.')
-            return
-          }
-        }catch(err){alert('Không thể xin quyền cảm biến: ' + err.message);return}
-      }
-
-      if (sensorActive){
-        window.removeEventListener('deviceorientation', handleOrientation)
-        useSensorBtn.textContent = 'Dùng cảm biến nghiêng (mobile)'
-        sensorActive = false
-        return
-      }
-
-      if ('DeviceOrientationEvent' in window){
-        window.addEventListener('deviceorientation', handleOrientation, true)
-        sensorActive = true
-        useSensorBtn.textContent = 'Tắt cảm biến'
-      } else {
-        alert('Trình duyệt không hỗ trợ DeviceOrientation. Dùng nhập tay thay thế.')
-      }
-    })
-
+    
     function handleOrientation(ev){
       let beta = ev.beta
       if (beta === null || beta === undefined) return

@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>THPT Tây Thạnh - Lớp 10C5 | Đo chiều cao của cây</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#60a5fa;--muted:#94a3b8;--glass: rgba(255,255,255,0.04)}
+    *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#071023 0%, #082036 100%);color:#e6eef8;font-size:18px}
+    .wrap{max-width:1100px;margin:32px auto;padding:40px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:20px;box-shadow:0 8px 36px rgba(2,6,23,0.6)}
+    header{display:flex;gap:20px;align-items:center}
+    h1{margin: 0;font-size:40px}
+    p.lead{color:var(--muted);margin:12px 0 24px;font-size:18px}
+    .grid{display:grid;grid-template-columns:1fr 400px;gap:24px}
+    .card{background:var(--card);padding:24px;border-radius:16px;font-size:18px}
+label {
+  display: block;
+  font-size: 18px;         /* to hơn một chút */
+  font-weight: 600;        /* đậm hơn */
+  color: #60a5fa;          /* màu xanh nổi bật (giống accent của bạn) */
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* tạo bóng nhẹ */
+}    input[type=number], input[type=text], button{width:100%;padding:14px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;font-size:18px}
+    .row{display:flex;gap:14px}
+    .row > *{flex:1}
+    .result{font-size:24px;font-weight:700;color:var(--accent);margin-top:10px}
+    .hint{font-size:15px;color:var(--muted);margin-top:8px}
+    .steps{font-size:16px;color:#dbeafe;background:linear-gradient(180deg, rgba(96,165,250,0.04), rgba(255,255,255,0.01));padding:14px;border-radius:10px;margin-top:14px}
+    .controls{display:flex;gap:12px;margin-top:14px}
+    .small{font-size:14px;color:var(--muted)}
+    .meter{display:flex;align-items:center;gap:8px;font-size:16px}
+    .container {
+  max-width: 1200px;   /* cho khung rộng tối đa */
+  margin: 0 auto;      /* căn giữa theo chiều ngang */
+  padding: 20px;
+}
+    footer{margin-top:20px;text-align:center;color:var(--muted);font-size:15px}
+button, .device-btn {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 15px;
+  border: 2px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(96,165,250,0.6), 0 0 20px rgba(96,165,250,0.3) inset;
+}
+
+button:hover, .device-btn:hover {
+  background: var(--accent);
+  color: #0f1724;
+  box-shadow: 0 0 20px rgba(96,165,250,0.9), 0 0 40px rgba(96,165,250,0.6) inset;
+}
+    .visual{height:260px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.006));display:flex;align-items:center;justify-content:center;flex-direction:column}
+    .meter-svg{width:240px;height:140px}
+    .warning{color:#ffcccc;font-size:15px}
+   /* Desktop rộng */
+@media (min-width:1200px){
+  .wrap{max-width: 95%; padding:50px;}
+  .grid{grid-template-columns: 2fr 1fr;}
+}
+
+/* Tablet ngang hoặc vừa */
+@media (max-width:880px){
+  .grid{grid-template-columns:1fr;}
+  .wrap{margin:16px; padding:20px;}
+  .meter-svg{width:100%; height:auto;}
+
+}
+
+/* Điện thoại nhỏ */
+@media (max-width:600px){
+  body{font-size:16px}
+  .wrap{padding:16px}
+  h1{font-size:22px}
+  input, button{font-size:16px; padding:12px}
+  .result{font-size:20px}
+  .meter{font-size:14px}
+  .meter-svg{width:100%; max-width:300px; height:auto}
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>THPT Tây Thạnh — Đo chiều cao cây bằng góc nhìn 📐🌳</h1>
+        <p class="lead">Trang thực hành môn Toán: nhập khoảng cách và góc, hoặc dùng cảm biến nghiêng trên điện thoại — trang sẽ tính ngay chiều cao ước lượng của cây. Dùng cho bài tập thực hành ngoài trời.</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+          <button id="toggleBtn" class="btn-toggle">Có thước đo</button>
+
+        <h2>Các tham số đo -- Không có thước đo</h2>
+        <div style="margin-top:14px">
+          <label>Góc nhìn lên gốc cây (độ)</label>
+          <input id="Goc_Nang" type="number" min="0" step="0.01" value="0">
+          <div class="hint">Góc là góc nhìn từ mắt bạn xuống góc cây phía dưới (độ). Có thể nhập thủ công. </div>
+        </div>
+
+        
+        <div style="margin-top:14px">
+          <label>Góc nhìn xuống đỉnh cây (độ)</label>
+          <div class="row">
+            <input id="Goc_Xuong" type="number" min="0" max="89.9" step="0.1" value="0">
+          </div>
+          <div class="hint">Góc là góc nhìn từ mắt bạn tới đỉnh cây phía trên (độ). Có thể nhập thủ công. </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <label>Chiều cao mắt bạn so với mặt đất (m)</label>
+          <input id="eyeHeight" type="number" min="0" step="0.01" value="0">
+          <div class="hint">Ví dụ trung bình khoảng 1.5–1.7 m. Nếu bạn đo từ cao thấp khác, chỉnh cho đúng.</div>
+        </div>
+
+        <div class="controls">
+          <button id="calcBtn">Tính ngay ✨</button>
+          <button id="resetBtn" class="device-btn">Đặt lại</button>
+          
+        </div>
+
+        <div class="steps" id="explain">
+          <div class="small">
+  Công thức: <strong>Chiều cao cây = (tan(góc nhìn lên từ mắt đến đỉnh cây) × chiều cao mắt) / tan(góc nhìn xuống từ mắt đến gốc cây) + Chiều cao mắt</strong>
+</div>
+<div class="small" style="margin-top:8px">
+  Giải thích:  
+  - Vẽ tam giác vuông từ mắt đến đỉnh và gốc cây.  
+  - Tan(góc lên) = phần trên / chiều cao mắt → phần trên = tan(góc lên) × chiều cao mắt  
+  - Tan(góc xuống) = phần trên / chiều cao cây → chiều cao cây = phần trên / tan(góc xuống)
+</div>
+
+
+        <div class="result" id="result">Chiều cao cây: — m</div>
+        <div class="hint" id="calcSteps"></div>
+
+      </section>
+
+      <aside class="card">
+        <h3>Minh họa trực quan</h3>
+<div class="visual">
+  <svg class="meter-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" id="svgVis">
+    <defs>
+      <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stop-color="#60a5fa" stop-opacity="0.9"/>
+        <stop offset="1" stop-color="#7dd3fc" stop-opacity="0.6"/>
+      </linearGradient>
+      <linearGradient id="g2" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stop-color="#fca5a5" stop-opacity="0.9"/>
+        <stop offset="1" stop-color="#f87171" stop-opacity="0.6"/>
+      </linearGradient>
+    </defs>
+
+    <!-- Nền và mặt đất -->
+    <rect x="0" y="0" width="200" height="120" fill="transparent"/>
+    <line x1="5" y1="105" x2="195" y2="105" stroke="#123" stroke-width="2" />
+
+    <!-- Mắt người -->
+    <circle id="eye" cx="30" cy="85" r="4" fill="#fff" />
+
+    <!-- Tia lên đỉnh cây -->
+    <line id="eyeToTop" x1="30" y1="85" x2="120" y2="40" stroke="url(#g)" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Tia xuống gốc cây -->
+    <line id="eyeToBottom" x1="30" y1="85" x2="120" y2="105" stroke="url(#g2)" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Cây -->
+    <rect id="treeTrunk" x="115" y="70" width="8" height="35" fill="#264653" rx="2" />
+    <circle id="treeTop" cx="118" cy="62" r="16" fill="#2a9d8f" />
+
+    <!-- Góc minh họa -->
+    <polyline id="Goc_XuongArc" points="30,85 60,75 90,65" stroke="#94a3b8" stroke-width="1.4" fill="none" stroke-dasharray="4 3" />
+    <text id="Goc_XuongText" x="60" y="78" font-size="14" fill="#e6eef8">0°</text>
+    <text id="heightText" x="110" y="60" font-size="14" fill="#e6eef8">H≈—m</text>
+    <text x="8" y="118" font-size="12" fill="#94a3b8">Bạn</text>
+    <text x="150" y="118" font-size="12" fill="#94a3b8">Cây</text>
+  </svg>
+</div>
+
+
+        <div style="margin-top:14px">
+          <div class="small">Ghi chú an toàn:</div>
+          <ul class="small" style="padding-left:20px;color:var(--muted);margin-top:8px">
+            <li>Đừng trèo lên cây để đo — chỉ dùng góc và khoảng cách.</li>
+            <li>Đảm bảo khoảng cách đo là đường thẳng ngang trên mặt đất (kề của tam giác vuông).</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <footer>Thực hành: Lớp 10C5 — THPT Tây Thạnh • Giáo viên giao: ứng dụng toán trong đời sống ✨</footer>
+  </div>
+
+  <script>
+    const btn = document.getElementById("toggleBtn");
+    btn.addEventListener("click", ()=>{
+      // khi ấn nút thì chuyển sang trang no-ruler.html
+      window.location.href = "index.html";
+    });
+    function deg2rad(d){return d * Math.PI / 180}
+    const Goc_NangEl = document.getElementById('Goc_Nang');   // góc lên
+const Goc_XuongEl = document.getElementById('Goc_Xuong'); // góc xuống
+const eyeEl = document.getElementById('eyeHeight');
+const calcBtn = document.getElementById('calcBtn');
+const resetBtn = document.getElementById('resetBtn');
+const resultEl = document.getElementById('result');
+const calcSteps = document.getElementById('calcSteps');
+
+const eyeToTop = document.getElementById('eyeToTop');     // tia lên
+const eyeToBottom = document.getElementById('eyeToBottom'); // tia xuống
+const treeTrunk = document.getElementById('treeTrunk');
+const treeTop = document.getElementById('treeTop');
+
+const Goc_XuongShow = document.getElementById('Goc_XuongShow');
+const distShow = document.getElementById('distShow');
+const Goc_XuongText = document.getElementById('Goc_XuongText');
+const heightText = document.getElementById('heightText');
+
+function deg2rad(d){ return d * Math.PI / 180; }
+function formatNum(x){ return Math.round(x*100)/100; }
+
+function computeHeight(gocNang, gocXuong, eyeHeight){
+    return (Math.tan(deg2rad(gocNang)) * eyeHeight) / Math.tan(deg2rad(gocXuong)) + eyeHeight;
+}
+
+
+
+function updateVisual(gocNang, gocXuong, distance, eyeHeight, H){
+    const eyeX = 30; 
+    const eyeY = 85;
+
+    // vị trí cây
+    const treeX = eyeX + distance*25;
+
+    // tính y đỉnh cây (tia lên)
+    const topY = eyeY - Math.tan(deg2rad(gocNang)) * (treeX - eyeX);
+
+    // tính y gốc cây (tia xuống)
+    const bottomY = eyeY + Math.tan(deg2rad(gocXuong)) * (treeX - eyeX);
+
+    // tia mắt lên đỉnh cây
+    eyeToTop.setAttribute('x1', eyeX);
+    eyeToTop.setAttribute('y1', eyeY);
+    eyeToTop.setAttribute('x2', treeX);
+    eyeToTop.setAttribute('y2', topY);
+
+    // tia mắt xuống gốc cây
+    eyeToBottom.setAttribute('x1', eyeX);
+    eyeToBottom.setAttribute('y1', eyeY);
+    eyeToBottom.setAttribute('x2', treeX);
+    eyeToBottom.setAttribute('y2', bottomY);
+
+
+    // cập nhật thân cây
+    const trunkBottom = bottomY; // gốc cây ở vị trí tia xuống
+    const trunkTop = topY;       // đỉnh cây ở vị trí tia lên
+    treeTrunk.setAttribute('x', treeX-4);
+    treeTrunk.setAttribute('y', trunkTop);
+    treeTrunk.setAttribute('height', trunkBottom - trunkTop);
+    
+    treeTop.setAttribute('cx', treeX);
+    treeTop.setAttribute('cy', trunkTop - 12); // nửa bán kính
+
+    // hiển thị text
+    Goc_XuongText.textContent = formatNum(gocXuong) + '°';
+    heightText.textContent = 'H≈' + formatNum(H) + ' m';
+    Goc_XuongShow.textContent = formatNum(gocXuong) + '°';
+    distShow.textContent = formatNum(distance) + ' m';
+}
+
+
+
+   function computeHeight(Goc_NangDeg, Goc_XuongDeg, eyeHeight){
+  const radUp = deg2rad(Goc_NangDeg)        // góc lên từ mắt
+  const radDown = deg2rad(Goc_XuongDeg)     // góc xuống từ mắt
+  const H = ((Math.tan(radUp) * Number(eyeHeight)) / Math.tan(radDown))+ Number(eyeHeight);
+  return {H, radUp, radDown}
+}
+
+
+    function showCalc(){
+      const d = Number(Goc_NangEl.value)
+      const a = Number(Goc_XuongEl.value)
+      const e = Number(eyeEl.value)
+      if (!isFinite(d) || d <= 0 || a >= 90){ resultEl.textContent = 'Vui lòng nhập số đo hợp lệ (độ)'; resultEl.classList.add('warning'); return }
+      if (!isFinite(a) || a <= 0 || a >= 90){ resultEl.textContent = 'Góc phải nằm trong (0,90).'; resultEl.classList.add('warning'); return }
+      if (!isFinite(e) || e <= 0){ resultEl.textContent = 'Nhập chiều cao mắt hợp lệ.'; resultEl.classList.add('warning'); return }
+
+      const {H, rad, opposite} = computeHeight(d,a,e)
+      resultEl.classList.remove('warning')
+      resultEl.textContent = 'Chiều cao cây: ' + formatNum(H) + ' m'
+    calcSteps.innerHTML = `
+    Tính chiều cao cây theo công thức mới:<br>
+    H = (tan(${formatNum(Goc_NangEl.value)}°) × ${formatNum(e)} ) / tan(${formatNum(Goc_XuongEl.value)}°) + ${formatNum(e)}<br>
+    H ≈ <strong>${formatNum(H)} m</strong>
+    `
+      updateVisual(a,d,H)
+    }
+
+    calcBtn.addEventListener('click', showCalc)
+    Goc_NangEl.addEventListener('input', showCalc)
+    Goc_XuongEl.addEventListener('input', showCalc)
+    eyeEl.addEventListener('input', showCalc)
+
+    resetBtn.addEventListener('click', ()=>{
+  Goc_NangEl.value = 0
+  Goc_XuongEl.value = 0
+  eyeEl.value = 0
+  resultEl.textContent = 'Chiều cao cây: — m'
+  calcSteps.textContent = ''
+  updateVisual(0,0,0)   // reset luôn phần minh họa
+})
+
+
+    let sensorActive = false
+    useSensorBtn.addEventListener('click', async ()=>{
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
+        try{
+          const perm = await DeviceOrientationEvent.requestPermission()
+          if (perm !== 'granted'){
+            alert('Bạn cần cho phép cảm biến để dùng tính năng này.')
+            return
+          }
+        }catch(err){alert('Không thể xin quyền cảm biến: ' + err.message);return}
+      }
+
+      if (sensorActive){
+        window.removeEventListener('deviceorientation', handleOrientation)
+        useSensorBtn.textContent = 'Dùng cảm biến nghiêng (mobile)'
+        sensorActive = false
+        return
+      }
+
+      if ('DeviceOrientationEvent' in window){
+        window.addEventListener('deviceorientation', handleOrientation, true)
+        sensorActive = true
+        useSensorBtn.textContent = 'Tắt cảm biến'
+      } else {
+        alert('Trình duyệt không hỗ trợ DeviceOrientation. Dùng nhập tay thay thế.')
+      }
+    })
+
+    function handleOrientation(ev){
+      let beta = ev.beta
+      if (beta === null || beta === undefined) return
+      let Goc_XuongApprox = Math.abs(beta)
+      if (Goc_XuongApprox < 5) Goc_XuongApprox = 5
+      if (Goc_XuongApprox > 85) Goc_XuongApprox = 85
+      Goc_XuongEl.value = Math.round(Goc_XuongApprox*10)/10
+      showCalc()
+    }
+
+    showCalc()
+  </script>
+</body>
+</html>
